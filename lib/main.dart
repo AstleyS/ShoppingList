@@ -106,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   itens.removeAt(index);
                 });
 
-                Scaffold.of(context).showSnackBar(SnackBar(content: Text("Produto $item removido com sucesso")));
+                Scaffold.of(context).showSnackBar(SnackBar(content: Text("O artigo $item foi removido da lista com sucesso")));
               },
               child: ListTile(title: Text('$item')),
             );
