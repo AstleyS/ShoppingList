@@ -263,45 +263,6 @@ class _MyHomePageState extends State<MyHomePage> {
         itemCount: itensList.length,
         itemBuilder: (context, index) {
           Item item = itensList[index];
-          return ListTile(
-            leading: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              child: Container(
-                width: 60,
-                height: 60,
-                padding: EdgeInsets.symmetric(vertical: 4.0),
-                alignment: Alignment.center,
-                child: /* Image */
-                Image.asset(
-                    "lib/${item.fotografia}",
-                    fit: BoxFit.cover
-                ),
-              ),
-            ),
-            title: Text('${item.nomeProduto}'),
-            subtitle: Text('Preço Total: ${item.precoTotal.toString()} €'),
-            selected: item.selecionado,
-            trailing:
-            FloatingActionButton(
-              onPressed: () {setState(() {
-                  item.quantidade++;
-                  _calculoPrecoTotal(item);
-                });
-              },
-              child: Icon(Icons.add),
-              backgroundColor: Colors.green,
-            ),
-          );
-        },
-      ),
-          /*
-      ListView.separated(
-        itemCount: itens.length,
-        separatorBuilder: (BuildContext context, int index) => Divider(),
-        itemBuilder: (BuildContext context, int index) {
-          _produzirItens(firstTime: firstTime);
-          final item = itens[index];
-          itemSelecionado = itensList.elementAt(index);
           return Dismissible(
             background: Container(
               alignment: Alignment.centerLeft,
@@ -315,7 +276,7 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Colors.green,
               child: Icon(Icons.check),
             ),
-            key: Key(item),
+            key: Key(item.nomeProduto),
             confirmDismiss: (direction) async {
               if (direction == DismissDirection.startToEnd) {
                 final bool res = await showDialog(
@@ -323,7 +284,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         content: Text(
-                            "Are you sure you want to delete ${item}?"),
+                            "Are you sure you want to delete ${item.nomeProduto}?"),
                         actions: <Widget>[
                           FlatButton(
                             child: Text(
@@ -337,13 +298,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               "Delete",
                               style: TextStyle(color: Colors.red),
                             ),
-                            onPressed: () {
-                              setState(() {
-                                firstTime = false;
-                                itens.removeAt(index);
+                            onPressed: () {setState(() {
+                                itensList.removeAt(index);
                               });
                               Navigator.of(context).pop();
-                              Scaffold.of(context).showSnackBar(SnackBar(content: Text("O artigo $item foi removido da lista com sucesso")));
+                              /*Scaffold.of(context).showSnackBar(SnackBar(
+                                  content: Text(
+                                     "O artigo ${item.nomeProduto} foi removido da lista com sucesso")))*/;
                             },
                           ),
                         ],
@@ -352,7 +313,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 return res;
               } else {
                 setState(() {
-                  itemSelecionado.selecionado = !itemSelecionado.selecionado;
+                  item.selecionado = !item.selecionado;
                 });
                 return null;
               }
@@ -367,17 +328,38 @@ class _MyHomePageState extends State<MyHomePage> {
                   alignment: Alignment.center,
                   child: /* Image */
                   Image.asset(
-                      "lib/${itemSelecionado.fotografia}",
+                      "lib/${item.fotografia}",
                       fit: BoxFit.cover
                   ),
                 ),
               ),
-              title: Text('$item'),
-              subtitle: Text('Preço Total: ${itemSelecionado.precoTotal}€'),
-              selected: itemSelecionado.selecionado,
+              title: Text('${item.nomeProduto}'),
+              subtitle: Text('Preço Total: ${item.precoTotal.toString()} €'),
+              selected: item.selecionado,
+              trailing:
+              FloatingActionButton(
+                onPressed: () {
+                  setState(() {
+                    item.quantidade++;
+                    _calculoPrecoTotal(item);
+                  });
+                },
+                child: Icon(Icons.add),
+                backgroundColor: Colors.green,
+              ),
             ),
           );
         },
+      ),
+          /*
+      ListView.separated(
+        itemCount: itens.length,
+        separatorBuilder: (BuildContext context, int index) => Divider(),
+        itemBuilder: (BuildContext context, int index) {
+          _produzirItens(firstTime: firstTime);
+          final item = itens[index];
+          itemSelecionado = itensList.elementAt(index);
+
       ),*/
 
     ); // This trailing comma makes auto-formatting nicer for build methods.
