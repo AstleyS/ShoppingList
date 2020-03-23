@@ -2,9 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-
 const nrItens = 9;
-
 
 void main() => runApp(MyApp());
 
@@ -28,7 +26,7 @@ class MyHomePage extends StatefulWidget {
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
-  
+
 }
 
 class Item extends StatefulWidget {
@@ -174,13 +172,13 @@ class _ItemState extends State<Item>{
                   ),
                 ),
                 FloatingActionButton(
-                    heroTag: 'remove',
+                    heroTag: 'remove01',
                     onPressed: () => {},
                     tooltip: 'Remover Item',
                     child: Icon(Icons.remove),
                     backgroundColor: Colors.red[500]),
                 FloatingActionButton(
-                    heroTag: 'add',
+                    heroTag: 'add02',
                     onPressed: () => {},
                     tooltip: 'Adicionar item',
                     child: Icon(Icons.add),
@@ -229,10 +227,18 @@ class _MyHomePageState extends State<MyHomePage> {
         descricao: 'Massa 500gr. Marca: Milaneza. Tipo: Meada'),
   ];
 
-  void _calculoPrecoTotal(Item item) {
+  void _calculoPrecoTotalItem(Item item) {
     setState(() {
       item.precoTotal = item.precoUnitario * item.quantidade;
     });
+  }
+
+  double _calcularPrecoTotal() {
+    double soma = 0;
+    for(Item i in itensList) {
+      soma += i.precoTotal;
+    }
+    return soma;
   }
 
   @override
@@ -254,7 +260,7 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: const Icon(Icons.add_shopping_cart),
             iconSize: 28,
             tooltip: 'Adicionar Produto',
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Item(title: "Adicionar Produto"))),
+            onPressed: () {}// Navigator.push(context, MaterialPageRoute(builder: (context) => Item(title: "Adicionar Produto"))),
           ),
         ],
       ),
@@ -326,22 +332,23 @@ class _MyHomePageState extends State<MyHomePage> {
                   height: 60,
                   padding: EdgeInsets.symmetric(vertical: 4.0),
                   alignment: Alignment.center,
-                  child: /* Image */
+                  child:
                   Image.asset(
                       "lib/${item.fotografia}",
                       fit: BoxFit.cover
                   ),
                 ),
               ),
-              title: Text('${item.nomeProduto}'),
-              subtitle: Text('Preço Total: ${item.precoTotal.toString()} €'),
+              title: Text('${item.nomeProduto}', style: TextStyle(fontSize: 20)),
+              subtitle: Text('Preço Total: ${item.precoTotal.toString()} €', style: TextStyle(fontSize: 18),),
               selected: item.selecionado,
               trailing:
               FloatingActionButton(
+                heroTag: 'add02',
                 onPressed: () {
                   setState(() {
                     item.quantidade++;
-                    _calculoPrecoTotal(item);
+                    _calculoPrecoTotalItem(item);
                   });
                 },
                 child: Icon(Icons.add),
@@ -351,17 +358,25 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
       ),
-          /*
-      ListView.separated(
-        itemCount: itens.length,
-        separatorBuilder: (BuildContext context, int index) => Divider(),
-        itemBuilder: (BuildContext context, int index) {
-          _produzirItens(firstTime: firstTime);
-          final item = itens[index];
-          itemSelecionado = itensList.elementAt(index);
-
-      ),*/
-
+      persistentFooterButtons: <Widget>[
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              height: MediaQuery.of(context).size.height * 0.05,
+              width: MediaQuery.of(context).size.width * 0.95,
+              decoration: BoxDecoration(
+                color: Colors.amber,
+              ),
+              child: Text(
+                  "Total: ${_calcularPrecoTotal()} €",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        )
+      ],
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 }
