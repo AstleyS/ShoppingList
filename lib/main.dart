@@ -2,8 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+
 const nrItens = 9;
-bool firstTime = true;
+
 
 void main() => runApp(MyApp());
 
@@ -27,6 +28,7 @@ class MyHomePage extends StatefulWidget {
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
+  
 }
 
 class Item extends StatefulWidget {
@@ -36,15 +38,16 @@ class Item extends StatefulWidget {
   final String nomeProduto;
   final String descricao;
   int quantidade;
-  final double precoUnitario = 1.50;
+  final double precoUnitario;
   double precoTotal;
-  bool selecionado = false;
+  bool selecionado;
 
   Item({
     Key key,
     this.title, this.fotografia = "fotografia",
-    this.nomeProduto, this.quantidade = 0,
-    this.precoTotal, this.descricao,
+    this.nomeProduto, this.precoUnitario = 1.0,
+    this.precoTotal = 0.0, this.quantidade = 0,
+    this.descricao, this.selecionado = false,
   }): super(key: key);
 
   @override
@@ -190,20 +193,11 @@ class _ItemState extends State<Item>{
               child: RaisedButton(
                 child: Text("Save"),
                 onPressed: () => {
-                  firstTime = true,
                   Navigator.of(context).pop(),
                 },
               ),
             ),
           )
-          /*
-          Image.asset(
-            'images/morango.jpg',
-            width: 600,
-            height: 240,
-            fit: BoxFit.cover,
-          ),
-           */
         ],
       ),
     ); // This trailing comma makes auto-formatting nicer for build methods.
@@ -214,10 +208,9 @@ class _ItemState extends State<Item>{
 
 class _MyHomePageState extends State<MyHomePage> {
 
-
   final itensList = <Item> [
     Item(fotografia: 'images/alcool_gel.jpg', nomeProduto: 'Alcool em Gel',
-        descricao: 'Alcool em Gel 430ml.'),
+        descricao: 'Alcool em Gel 430ml.', precoUnitario: 10,),
     Item(fotografia: 'images/atum.jpg', nomeProduto: 'Atum',
         descricao: 'Atum 345gr. Marca: Bom Petisco'),
     Item(fotografia: 'images/arroz.jpg', nomeProduto: 'Arroz',
@@ -231,24 +224,10 @@ class _MyHomePageState extends State<MyHomePage> {
     Item(fotografia: 'images/grao.jpg', nomeProduto: 'Lata de Grão de Bico',
         descricao: 'Lata de Grão de Bico 845gr. Marca: Compal.'),
     Item(fotografia: 'images/luvas.jpg', nomeProduto: 'Luvas Descartáveis',
-        descricao: 'Caixa Luvas Descartáveis 100un. Marca: Vileda'),
+        descricao: 'Caixa Luvas Descartáveis 100un. Marca: Vileda', precoUnitario: 10),
     Item(fotografia: 'images/massa.jpg', nomeProduto: 'Massa',
         descricao: 'Massa 500gr. Marca: Milaneza. Tipo: Meada'),
   ];
-
-  List<String> itens = List<String>(nrItens);
-  Item itemSelecionado = Item();
-
-  void _produzirItens({firstTime}) {
-    if (firstTime)
-      itens = List<String>.generate(nrItens, (int index) => itensList[index].nomeProduto);
-  }
-
-  void calculoPrecoTotal(Item item){
-    setState(() {
-      item.precoTotal = item.quantidade * item.precoUnitario;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -273,7 +252,45 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: ListView.separated(
+      body:
+      ListView.builder(
+        itemCount: itensList.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            leading: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                width: 60,
+                height: 60,
+                padding: EdgeInsets.symmetric(vertical: 4.0),
+                alignment: Alignment.center,
+                child: /* Image */
+                Image.asset(
+                    "lib/${itensList[index].fotografia}",
+                    fit: BoxFit.cover
+                ),
+              ),
+            ),
+            title: Text('${itensList[index].nomeProduto}'),
+            subtitle: Text('Preço Total: ${itensList[index].precoTotal.toString()} €'),
+            selected: itensList[index].selecionado,
+            trailing:
+            Row(
+              children: <Widget>[
+                FloatingActionButton(
+                  onPressed: () {setState(() {
+                    itensList[index].quantidade--;
+                  });
+
+                  },
+                )
+              ],
+            ),
+          );
+        },
+      ),
+          /*
+      ListView.separated(
         itemCount: itens.length,
         separatorBuilder: (BuildContext context, int index) => Divider(),
         itemBuilder: (BuildContext context, int index) {
@@ -343,7 +360,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   height: 60,
                   padding: EdgeInsets.symmetric(vertical: 4.0),
                   alignment: Alignment.center,
-                  child: /* Image */Text("${itemSelecionado.fotografia}"),
+                  child: /* Image */
+                  Image.asset(
+                      "lib/${itemSelecionado.fotografia}",
+                      fit: BoxFit.cover
+                  ),
                 ),
               ),
               title: Text('$item'),
@@ -352,7 +373,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           );
         },
-      ),
+      ),*/
 
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
