@@ -1,8 +1,6 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter/services.dart';
 
 const nrItens = 9;
 bool firstTime = true;
@@ -216,6 +214,7 @@ class _ItemState extends State<Item>{
 
 class _MyHomePageState extends State<MyHomePage> {
 
+
   final itensList = <Item> [
     Item(fotografia: 'images/alcool_gel.jpg', nomeProduto: 'Alcool em Gel',
         descricao: 'Alcool em Gel 430ml.'),
@@ -240,9 +239,15 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> itens = List<String>(nrItens);
   Item itemSelecionado = Item();
 
-  void produzirItens({firstTime}) {
+  void _produzirItens({firstTime}) {
     if (firstTime)
       itens = List<String>.generate(nrItens, (int index) => itensList[index].nomeProduto);
+  }
+
+  void calculoPrecoTotal(Item item){
+    setState(() {
+      item.precoTotal = item.quantidade * item.precoUnitario;
+    });
   }
 
   @override
@@ -272,19 +277,19 @@ class _MyHomePageState extends State<MyHomePage> {
         itemCount: itens.length,
         separatorBuilder: (BuildContext context, int index) => Divider(),
         itemBuilder: (BuildContext context, int index) {
-          produzirItens(firstTime: firstTime);
+          _produzirItens(firstTime: firstTime);
           final item = itens[index];
           itemSelecionado = itensList.elementAt(index);
           return Dismissible(
             background: Container(
               alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.all(15),
+              padding: const EdgeInsets.all(5),
               color: Colors.red,
               child: Icon(Icons.delete),
             ),
             secondaryBackground: Container(
               alignment: Alignment.centerRight,
-              padding: const EdgeInsets.all(15),
+              padding: const EdgeInsets.all(5),
               color: Colors.green,
               child: Icon(Icons.check),
             ),
@@ -316,12 +321,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                 itens.removeAt(index);
                               });
                               Navigator.of(context).pop();
+                              Scaffold.of(context).showSnackBar(SnackBar(content: Text("O artigo $item foi removido da lista com sucesso")));
                             },
                           ),
                         ],
                       );
                     });
-                Scaffold.of(context).showSnackBar(SnackBar(content: Text("O artigo $item foi removido da lista com sucesso")));
                 return res;
               } else {
                 setState(() {
@@ -342,12 +347,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               title: Text('$item'),
-              subtitle: Text('${itemSelecionado.quantidade}'),
+              subtitle: Text('Preço Total: ${itemSelecionado.precoTotal}€'),
               selected: itemSelecionado.selecionado,
             ),
           );
         },
       ),
+
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 }
