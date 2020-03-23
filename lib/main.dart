@@ -1,4 +1,11 @@
+import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
+
+const nrItens = 9;
+bool firstTime = true;
 
 void main() => runApp(MyApp());
 
@@ -24,94 +31,323 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class Item extends StatelessWidget{
+class Item extends StatefulWidget {
 
+  final String title;
   final String fotografia;
   final String nomeProduto;
-  final int quantidade;
-  final int precoTotal;
+  final String descricao;
+  int quantidade;
+  final double precoUnitario = 1.50;
+  double precoTotal;
+  bool selecionado = false;
 
   Item({
     Key key,
-    this.fotografia, this.nomeProduto,
-    this.quantidade, this.precoTotal,
+    this.title, this.fotografia = "fotografia",
+    this.nomeProduto, this.quantidade = 0,
+    this.precoTotal, this.descricao,
   }): super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black12,
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.width / 4,
-      margin: EdgeInsets.all(2.0),
+  _ItemState createState() => _ItemState();
+
+}
+
+class _ItemState extends State<Item>{
+
+  Future<File> imageFile;
+
+  void imagemDaGaleria(ImageSource source) {
+    setState(() {
+      imageFile = ImagePicker.pickImage(source: source);
+    });
+  }
+
+  Widget displayImagem() {
+    return FutureBuilder<File>(
+      future: imageFile,
+      builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.data != null) {
+          return Image.file(
+            snapshot.data,
+            width: 300,
+            height: 300,
+          );
+        } else if (snapshot.error != null) {
+          return const Text(
+            'Error Picking Image',
+            textAlign: TextAlign.center,
+          );
+        } else {
+          return const Text(
+            'No Image Selected',
+            textAlign: TextAlign.center,
+          );
+        }
+      },
     );
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+            widget.title,
+            style: TextStyle(fontSize: 28)
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          iconSize: 28,
+          onPressed: () => Navigator.of(context).pop(),
+          tooltip: 'Back',
+        ),
+      ),
+      body: ListView(
+        children: [
+          displayImagem(),
+          ButtonTheme(
+            child: RaisedButton(
+              child: Text("Selecione uma imagem da galeria"),
+              onPressed: () => imagemDaGaleria(ImageSource.gallery),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(32),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          'Nome Produto: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Descricao Produto:',
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(32),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          'Preco Unitario Produto: €',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Quantidade: ',
+                      ),
+                      Text(
+                        'Preco Total Produto: €',
+                        style: TextStyle(
+                          color: Colors.amber[500],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                FloatingActionButton(
+                    heroTag: 'remove',
+                    onPressed: () => {},
+                    tooltip: 'Remover Item',
+                    child: Icon(Icons.remove),
+                    backgroundColor: Colors.red[500]),
+                FloatingActionButton(
+                    heroTag: 'add',
+                    onPressed: () => {},
+                    tooltip: 'Adicionar item',
+                    child: Icon(Icons.add),
+                    backgroundColor: Colors.green[500]),
+              ],
+            ),
+          ),
+          Container(
+            child:ButtonTheme(
+              child: RaisedButton(
+                child: Text("Save"),
+                onPressed: () => {
+                  firstTime = true,
+                  Navigator.of(context).pop(),
+                },
+              ),
+            ),
+          )
+          /*
+          Image.asset(
+            'images/morango.jpg',
+            width: 600,
+            height: 240,
+            fit: BoxFit.cover,
+          ),
+           */
+        ],
+      ),
+    ); // This trailing comma makes auto-formatting nicer for build methods.
+  }
 
 
 }
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  int _counter = 0;
-  final itens = List<String>();
+  final itensList = <Item> [
+    Item(fotografia: 'images/alcool_gel.jpg', nomeProduto: 'Alcool em Gel',
+        descricao: 'Alcool em Gel 430ml.'),
+    Item(fotografia: 'images/atum.jpg', nomeProduto: 'Atum',
+        descricao: 'Atum 345gr. Marca: Bom Petisco'),
+    Item(fotografia: 'images/arroz.jpg', nomeProduto: 'Arroz',
+        descricao: 'Arroz 1kg. Marca: Cigala. Tipo: Agulha'),
+    Item(fotografia: 'images/cereais.jpg', nomeProduto: 'Cereais Nesquik',
+        descricao: 'Cereais 375gr. Marca: Nestlé'),
+    Item(fotografia: 'images/cafe.jpg', nomeProduto: 'Café',
+        descricao: 'Café 7 capsulas. Marca: Boundi. Tipo: Descafeinado'),
+    Item(fotografia: 'images/feijao.jpg', nomeProduto: 'Lata de Feijão',
+        descricao: 'Lata de Feijão 845gr. Marca: Compal. Tipo: Encarnado'),
+    Item(fotografia: 'images/grao.jpg', nomeProduto: 'Lata de Grão de Bico',
+        descricao: 'Lata de Grão de Bico 845gr. Marca: Compal.'),
+    Item(fotografia: 'images/luvas.jpg', nomeProduto: 'Luvas Descartáveis',
+        descricao: 'Caixa Luvas Descartáveis 100un. Marca: Vileda'),
+    Item(fotografia: 'images/massa.jpg', nomeProduto: 'Massa',
+        descricao: 'Massa 500gr. Marca: Milaneza. Tipo: Meada'),
+  ];
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-      itens.add("Produto $_counter");
-    });
-  }
-  void _decrementCounter() {
-    setState(() {
-      if (_counter > 0 ) _counter--;
-    });
+  List<String> itens = List<String>(nrItens);
+  Item itemSelecionado = Item();
+
+  void produzirItens({firstTime}) {
+    if (firstTime)
+      itens = List<String>.generate(nrItens, (int index) => itensList[index].nomeProduto);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
+      appBar: AppBar(
+        title: Text(
             widget.title,
             style: TextStyle(fontSize: 28)
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          iconSize: 28,
+          onPressed: () {},
+          tooltip: 'Close App',
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.add),
             iconSize: 28,
-            onPressed: () {  },
-            tooltip: 'Back',
+            tooltip: 'Adicionar Produto',
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Item(title: "Adicionar Produto"))),
           ),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.add),
-              iconSize: 28,
-              onPressed: _incrementCounter,
-              tooltip: 'Adicionar Producto',
+        ],
+      ),
+      body: ListView.separated(
+        itemCount: itens.length,
+        separatorBuilder: (BuildContext context, int index) => Divider(),
+        itemBuilder: (BuildContext context, int index) {
+          produzirItens(firstTime: firstTime);
+          final item = itens[index];
+          itemSelecionado = itensList.elementAt(index);
+          return Dismissible(
+            background: Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.all(15),
+              color: Colors.red,
+              child: Icon(Icons.delete),
             ),
-
-          ],
-        ),
-        body: ListView.separated(
-          itemCount: itens.length,
-          separatorBuilder: (BuildContext context, int index) => Divider(),
-          itemBuilder: (BuildContext context, int index) {
-            final item = itens[index];
-            return Dismissible(
-              // Show a red background as the item is swiped away.
-              background: Container(color: Colors.red),
-              key: Key(item),
-              onDismissed: (direction) {
-                setState(() {
-                  itens.removeAt(index);
-                });
-
+            secondaryBackground: Container(
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.all(15),
+              color: Colors.green,
+              child: Icon(Icons.check),
+            ),
+            key: Key(item),
+            confirmDismiss: (direction) async {
+              if (direction == DismissDirection.startToEnd) {
+                final bool res = await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Text(
+                            "Are you sure you want to delete ${item}?"),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                          FlatButton(
+                            child: Text(
+                              "Delete",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                firstTime = false;
+                                itens.removeAt(index);
+                              });
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    });
                 Scaffold.of(context).showSnackBar(SnackBar(content: Text("O artigo $item foi removido da lista com sucesso")));
-              },
-              child: ListTile(title: Text('$item')),
-            );
-          },
-        ),
+                return res;
+              } else {
+                setState(() {
+                  itemSelecionado.selecionado = !itemSelecionado.selecionado;
+                });
+                return null;
+              }
+            },
+            child: ListTile(
+              leading: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  padding: EdgeInsets.symmetric(vertical: 4.0),
+                  alignment: Alignment.center,
+                  child: /* Image */Text("${itemSelecionado.fotografia}"),
+                ),
+              ),
+              title: Text('$item'),
+              subtitle: Text('${itemSelecionado.quantidade}'),
+              selected: itemSelecionado.selecionado,
+            ),
+          );
+        },
+      ),
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 }
