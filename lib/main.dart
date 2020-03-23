@@ -241,6 +241,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return soma;
   }
 
+  int _calcularQuantidadeTotal() {
+    int soma = 0;
+    for(Item i in itensList) {
+      soma += i.quantidade;
+    }
+    return soma;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -363,13 +371,13 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Container(
-              height: MediaQuery.of(context).size.height * 0.05,
+              height: MediaQuery.of(context).size.height * 0.10,
               width: MediaQuery.of(context).size.width * 0.95,
               decoration: BoxDecoration(
                 color: Colors.amber,
               ),
               child: Text(
-                  "Total: ${_calcularPrecoTotal()} €",
+                  "Quantidade Total: ${_calcularQuantidadeTotal()}\nPreço Total: ${_calcularPrecoTotal()} €",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white),
                 textAlign: TextAlign.center,
               ),
