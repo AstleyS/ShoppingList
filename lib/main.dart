@@ -229,6 +229,12 @@ class _MyHomePageState extends State<MyHomePage> {
         descricao: 'Massa 500gr. Marca: Milaneza. Tipo: Meada'),
   ];
 
+  void _calculoPrecoTotal(Item item) {
+    setState(() {
+      item.precoTotal = item.precoUnitario * item.quantidade;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -245,7 +251,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add_shopping_cart),
             iconSize: 28,
             tooltip: 'Adicionar Produto',
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Item(title: "Adicionar Produto"))),
@@ -256,6 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ListView.builder(
         itemCount: itensList.length,
         itemBuilder: (context, index) {
+          Item item = itensList[index];
           return ListTile(
             leading: GestureDetector(
               behavior: HitTestBehavior.opaque,
@@ -266,25 +273,23 @@ class _MyHomePageState extends State<MyHomePage> {
                 alignment: Alignment.center,
                 child: /* Image */
                 Image.asset(
-                    "lib/${itensList[index].fotografia}",
+                    "lib/${item.fotografia}",
                     fit: BoxFit.cover
                 ),
               ),
             ),
-            title: Text('${itensList[index].nomeProduto}'),
-            subtitle: Text('Preço Total: ${itensList[index].precoTotal.toString()} €'),
-            selected: itensList[index].selecionado,
+            title: Text('${item.nomeProduto}'),
+            subtitle: Text('Preço Total: ${item.precoTotal.toString()} €'),
+            selected: item.selecionado,
             trailing:
-            Row(
-              children: <Widget>[
-                FloatingActionButton(
-                  onPressed: () {setState(() {
-                    itensList[index].quantidade--;
-                  });
-
-                  },
-                )
-              ],
+            FloatingActionButton(
+              onPressed: () {setState(() {
+                  item.quantidade++;
+                  _calculoPrecoTotal(item);
+                });
+              },
+              child: Icon(Icons.add),
+              backgroundColor: Colors.green,
             ),
           );
         },
