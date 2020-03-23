@@ -328,8 +328,8 @@ class _MyHomePageState extends State<MyHomePage> {
               leading: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 child: Container(
-                  width: 60,
-                  height: 60,
+                  width: 75,
+                  height: 75,
                   padding: EdgeInsets.symmetric(vertical: 4.0),
                   alignment: Alignment.center,
                   child:
@@ -339,8 +339,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-              title: Text('${item.nomeProduto}', style: TextStyle(fontSize: 20)),
-              subtitle: Text('Preço Total: ${item.precoTotal.toString()} €', style: TextStyle(fontSize: 18),),
+              title: Text('${item.nomeProduto}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              subtitle: Text('Quantidade: ${item.quantidade.toString()}\nPreço Total: ${item.precoTotal.toString()} €', style: TextStyle(fontSize: 18),),
               selected: item.selecionado,
               trailing:
               FloatingActionButton(
