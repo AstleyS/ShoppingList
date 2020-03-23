@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -44,7 +45,7 @@ class Item extends StatefulWidget {
     Key key,
     this.title, this.fotografia = "fotografia",
     this.nomeProduto, this.precoUnitario = 1.0,
-    this.precoTotal = 0.0, this.quantidade = 0,
+    this.precoTotal = 0.0, this.quantidade = 3,
     this.descricao, this.selecionado = false,
   }): super(key: key);
 
@@ -171,19 +172,7 @@ class _ItemState extends State<Item>{
                     ],
                   ),
                 ),
-                FloatingActionButton(
-                    heroTag: 'remove01',
-                    onPressed: () => {},
-                    tooltip: 'Remover Item',
-                    child: Icon(Icons.remove),
-                    backgroundColor: Colors.red[500]),
-                FloatingActionButton(
-                    heroTag: 'add02',
-                    onPressed: () => {},
-                    tooltip: 'Adicionar item',
-                    child: Icon(Icons.add),
-                    backgroundColor: Colors.green[500]),
-              ],
+                ],
             ),
           ),
           Container(
@@ -206,6 +195,8 @@ class _ItemState extends State<Item>{
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  double precoTotalItens = 0;
+
   final itensList = <Item> [
     Item(fotografia: 'images/alcool_gel.jpg', nomeProduto: 'Alcool em Gel',
         descricao: 'Alcool em Gel 430ml.', precoUnitario: 10,),
@@ -221,19 +212,17 @@ class _MyHomePageState extends State<MyHomePage> {
         descricao: 'Lata de Feijão 845gr. Marca: Compal. Tipo: Encarnado'),
     Item(fotografia: 'images/grao.jpg', nomeProduto: 'Lata de Grão de Bico',
         descricao: 'Lata de Grão de Bico 845gr. Marca: Compal.'),
-    Item(fotografia: 'images/luvas.jpg', nomeProduto: 'Luvas Descartáveis',
+    Item(fotografia: 'images/luvas.jpg', nomeProduto: 'Luvas',
         descricao: 'Caixa Luvas Descartáveis 100un. Marca: Vileda', precoUnitario: 10),
     Item(fotografia: 'images/massa.jpg', nomeProduto: 'Massa',
         descricao: 'Massa 500gr. Marca: Milaneza. Tipo: Meada'),
   ];
 
-  void _calculoPrecoTotalItem(Item item) {
-    setState(() {
-      item.precoTotal = item.precoUnitario * item.quantidade;
-    });
+  double _calculoPrecoTotalItem(Item item) {
+    return item.precoUnitario * item.quantidade;
   }
 
-  double _calcularPrecoTotal() {
+  double _calcularPrecoTotalItens() {
     double soma = 0;
     for(Item i in itensList) {
       soma += i.precoTotal;
@@ -241,7 +230,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return soma;
   }
 
-  int _calcularQuantidadeTotal() {
+  int _calcularQuantidadeTotalItens() {
     int soma = 0;
     for(Item i in itensList) {
       soma += i.quantidade;
@@ -277,6 +266,8 @@ class _MyHomePageState extends State<MyHomePage> {
         itemCount: itensList.length,
         itemBuilder: (context, index) {
           Item item = itensList[index];
+          item.precoTotal = _calculoPrecoTotalItem(item);
+          precoTotalItens = _calcularPrecoTotalItens();
           return Dismissible(
             background: Container(
               alignment: Alignment.centerLeft,
@@ -336,8 +327,8 @@ class _MyHomePageState extends State<MyHomePage> {
               leading: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 child: Container(
-                  width: 75,
-                  height: 75,
+                  width: 85,
+                  height: 85,
                   padding: EdgeInsets.symmetric(vertical: 4.0),
                   alignment: Alignment.center,
                   child:
@@ -350,18 +341,79 @@ class _MyHomePageState extends State<MyHomePage> {
               title: Text('${item.nomeProduto}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               subtitle: Text('Quantidade: ${item.quantidade.toString()}\nPreço Total: ${item.precoTotal.toString()} €', style: TextStyle(fontSize: 18),),
               selected: item.selecionado,
-              trailing:
-              FloatingActionButton(
-                heroTag: 'add02',
-                onPressed: () {
-                  setState(() {
-                    item.quantidade++;
-                    _calculoPrecoTotalItem(item);
-                  });
-                },
-                child: Icon(Icons.add),
-                backgroundColor: Colors.green,
+              trailing: SizedBox(
+                width: 125,
+                height: 125,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row (
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      FloatingActionButton(
+                        heroTag: 'remove02',
+                        onPressed: () {setState(() {
+                          if(item.quantidade > 0) {
+                            item.quantidade--;
+                            item.precoTotal = _calculoPrecoTotalItem(item);
+                            if (item.quantidade == 0) itensList.removeAt(index);
+                          }
+                        });
+                        },
+                        child: Icon(Icons.remove),
+                        tooltip: 'Remover',
+                        backgroundColor: Colors.red,
+                      ),
+                      FloatingActionButton(
+                        heroTag: 'add02',
+                        onPressed: () {setState(() {
+                          item.quantidade++;
+                        });
+                      },
+                        child: Icon(Icons.add),
+                        tooltip: 'Adicionar',
+                        backgroundColor: Colors.green,
+                    ),
+                  ],
+                  ),
+                ),
               ),
+              /*
+              Row(
+                children: <Widget> [
+                  SizedBox (
+                    width: 75,
+                    height: 75,
+                    child: Column(
+                      children: <Widget>[
+                        FloatingActionButton(
+                          heroTag: 'add02',
+                          onPressed: () {
+                            setState(() {
+                              item.quantidade++;
+                              _calculoPrecoTotalItem(item);
+                            });
+                          },
+                          child: Icon(Icons.add),
+                          backgroundColor: Colors.green,
+                        ),
+                        FloatingActionButton(
+                          heroTag: 'remove02',
+                          onPressed: () {
+                            setState(() {
+                              if (item.quantidade > 0) item.quantidade--;
+                              _calculoPrecoTotalItem(item);
+                            });
+                          },
+                          child: Icon(Icons.add),
+                          backgroundColor: Colors.green,
+                        ),
+
+                      ],
+                    ),
+                  )
+              ],
+              ),*/
             ),
           );
         },
@@ -377,7 +429,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.amber,
               ),
               child: Text(
-                  "Quantidade Total: ${_calcularQuantidadeTotal()}\nPreço Total: ${_calcularPrecoTotal()} €",
+                  "Quantidade Total: ${_calcularQuantidadeTotalItens()}\nPreço Total: ${_calcularPrecoTotalItens()} €",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white),
                 textAlign: TextAlign.center,
               ),
