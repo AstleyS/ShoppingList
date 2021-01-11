@@ -1,7 +1,8 @@
-# miniprojetoapp
-
+# Shopping List
 A new Flutter application.
-
+## A mini-project from mobile computation course
+#### Last update: 23/05/2020
+---
 ## Getting Started
 
 This project is a starting point for a Flutter application.
