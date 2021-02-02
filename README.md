@@ -2,7 +2,7 @@
 A new Flutter application.
 ## A mini-project from mobile computation course
 #### Last update: 23/05/2020
-Still needs some fixes from previous mistakes
+##### Still needs some fixes from previous mistakes
 ---
 ## Getting Started
 
